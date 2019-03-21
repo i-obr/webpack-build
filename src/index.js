@@ -1,5 +1,5 @@
-import "./style.css";
+import './style.css';
 
-console.log("hello, world");
+console.log('hello, world')
 
-module.hot.accept();
+module.hot.accept()
