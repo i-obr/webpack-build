@@ -5,11 +5,11 @@ config()
 export default {
   name: 'Name Project',
   copyright: 'Name Company',
-  path: {
+  paths: {
     src: {
       base: './src/',
-      css: './src/css',
-      js: './src/js'
+      css: './src/css/',
+      js: './src/js/'
     },
     dist: {
       base: './web/dist/',
@@ -20,17 +20,22 @@ export default {
         './js'
       ]
     },
-    templates: './templates'
+    templates: './templates/'
   },
-  urls: {},
+  urls: {
+    live: 'https://example.com/',
+    local: 'http://example.test/',
+    critical: 'http://example.test/',
+    publicPath: () => process.env.PUBLIC_PATH || '/dist/'
+  },
   vars: {},
   entries: {
     'app': 'app.js'
   },
   copyWebpackConfig: [
     {
-      from: '',
-      to: ''
+      from: './src/js/workbox-catch-handler.js',
+      to: 'js/[name].[ext]'
     }
   ],
   criticalCssConfig: {
