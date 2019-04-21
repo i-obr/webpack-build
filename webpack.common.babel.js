@@ -1,26 +1,24 @@
-import path from 'path'
-import merge from 'webpack-merge'
+import path from 'path';
+import merge from 'webpack-merge';
 
-import CopyWebpackPlugin from 'copy-webpack-plugin'
-import ManifestPlugin from 'webpack-manifest-plugin'
-import WebpackNotifierPlugin from 'webpack-notifier'
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import ManifestPlugin from 'webpack-manifest-plugin';
+import WebpackNotifierPlugin from 'webpack-notifier';
 
-import pkg from './package.json'
-import settings from './webpack.settings.babel'
-
-const LEGACY_CONFIG = 'legacy'
-const MODERN_CONFIG = 'modern'
+import pkg from './package.json';
+import settings from './webpack.settings.babel';
 
 const configureEntries = () => {
-  let entries = {}
-  for (const [key, value] of Object.entries(settings.entries)) {
-    entries[key] = path.resolve(__dirname, settings.paths.src.js + value)
-  }
+  const entries = {};
 
-  return entries
-}
+  Object.entries(settings.entries).forEach(([key, value]) => {
+    entries[key] = path.resolve(__dirname, settings.paths.src.js + value);
+  });
 
-const configureBabelLoader = (browserslist) => {
+  return entries;
+};
+
+const configureBabelLoader = browserslist => {
   return {
     test: /\.js$/,
     exclude: '/node_modules/',
@@ -29,8 +27,10 @@ const configureBabelLoader = (browserslist) => {
       options: {
         presets: [
           [
-            '@babel/preset-env', {
+            '@babel/preset-env',
+            {
               modules: false,
+              loose: true,
               useBuiltIns: 'entry',
               corejs: '3.0.0',
               targets: {
@@ -42,18 +42,19 @@ const configureBabelLoader = (browserslist) => {
         plugins: [
           '@babel/plugin-syntax-dynamic-import',
           [
-            '@babel/plugin-transform-runtime', {
-              'regenerator': true,
+            '@babel/plugin-transform-runtime',
+            {
+              regenerator: true,
               useESModules: true
             }
           ]
         ]
       }
     }
-  }
-}
+  };
+};
 
-const configureFont = () => {
+const configureFontLoader = () => {
   // Example imports fonts
   // import comicsans from '../fonts/ComicSans.woff2';
   return {
@@ -66,19 +67,19 @@ const configureFont = () => {
         }
       }
     ]
-  }
-}
+  };
+};
 
-const configureManifest = (fileName) => {
+const configureManifest = fileName => {
   return {
-    fileName: fileName,
+    fileName,
     basePath: settings.manifestConfig.basePath,
-    map: (file) => {
-      file.name = file.name.replace(/(\.[a-f0-9]{32})(\..*)$/, '$2')
-      return file
+    map: file => {
+      file.name = file.name.replace(/(\.[a-f0-9]{32})(\..*)$/, '$2');
+      return file;
     }
-  }
-}
+  };
+};
 
 const baseConfig = {
   name: pkg.name,
@@ -88,48 +89,38 @@ const baseConfig = {
     publicPath: settings.urls.publicPath()
   },
   resolve: {},
-  module: {},
+  module: {
+    rules: [configureFontLoader()]
+  },
   plugins: [
     new WebpackNotifierPlugin({ title: 'Webpack', excludeWarnings: true, alwaysNotify: true })
   ]
-}
+};
 
 const legacyConfig = {
   module: {
-    rules: [
-      configureBabelLoader(Object.values(pkg.browserslist.legacyBrowsers))
-    ]
+    rules: [configureBabelLoader(Object.values(pkg.browserslist.legacyBrowsers))]
   },
   plugins: [
-    new CopyWebpackPlugin(
-      settings.copyWebpackConfig
-    ),
-    new ManifestPlugin(
-      configureManifest('manifest-legacy.json')
-    )
+    new CopyWebpackPlugin(settings.copyWebpackConfig),
+    new ManifestPlugin(configureManifest('manifest-legacy.json'))
   ]
-}
+};
 
 const modernConfig = {
   module: {
-    rules: [
-      configureBabelLoader(Object.values(pkg.browserslist.modernBrowsers))
-    ]
+    rules: [configureBabelLoader(Object.values(pkg.browserslist.modernBrowsers))]
   },
-  plugins: [
-    new ManifestPlugin(
-      configureManifest('manifest.json')
-    )
-  ]
-}
+  plugins: [new ManifestPlugin(configureManifest('manifest.json'))]
+};
 
 export default {
-  'legacyConfig': merge.strategy({
+  legacyConfig: merge.strategy({
     module: 'prepend',
     plugins: 'prepend'
   })(baseConfig, legacyConfig),
-  'modernConfig': merge.strategy({
+  modernConfig: merge.strategy({
     module: 'prepend',
     plugins: 'prepend'
   })(baseConfig, modernConfig)
-}
+};

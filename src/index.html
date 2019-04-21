@@ -1,12 +1,11 @@
 <html>
+  <head>
+    <link rel="stylesheet" href="<%=htmlWebpackPlugin.files.chunks.style.css %>" />
+  </head>
 
-<head>
-	<link rel="stylesheet" href="<%=htmlWebpackPlugin.files.chunks.style.css %>">
-</head>
-
-<body>
-	<script type="module" src="main.js"></script>
-	<script nomodule src="main-legacy.js"></script>
-</body>
-
+  <body>
+    <div><%=htmlWebpackPlugin.files.chunks %></div>
+    <script type="module" src="main.js"></script>
+    <script nomodule src="main-legacy.js"></script>
+  </body>
 </html>

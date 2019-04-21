@@ -1,6 +1,6 @@
-import { config } from 'dotenv'
+import { config } from 'dotenv';
 
-config()
+config();
 
 export default {
   name: 'Name Project',
@@ -12,13 +12,7 @@ export default {
       js: './src/js/'
     },
     dist: {
-      base: './web/dist/',
-      clean: [
-        './img',
-        './criticalcss',
-        './css',
-        './js'
-      ]
+      base: './web/dist/'
     },
     templates: './templates/'
   },
@@ -30,7 +24,7 @@ export default {
   },
   vars: {},
   entries: {
-    'app': 'app.js'
+    app: 'app.js'
   },
   copyWebpackConfig: [
     {
@@ -43,11 +37,11 @@ export default {
     suffix: '_critical.min.css',
     criticalHeight: 1200,
     criticalWidth: 1200,
-    ampPrefix: 'amp_',
-    ampCriticalHeight: 19200,
-    ampCriticalWidth: 600,
     pages: [
-      {}
+      {
+        url: '',
+        template: 'index'
+      }
     ]
   },
   devServerConfig: {
@@ -60,7 +54,12 @@ export default {
   manifestConfig: {
     basePath: ''
   },
-  purgeCssConfig: {},
+  purgeCssConfig: {
+    paths: ['./templates/**/*.html'],
+    whitelist: ['./src/css/components/**/*.{css,pcss}'],
+    whitelistPatterns: [],
+    extensions: ['html', 'js']
+  },
   saveRemoteFileConfig: [
     {
       url: 'https://www.google-analytics.com/analytics.js',
@@ -80,19 +79,10 @@ export default {
   workboxConfig: {
     swDest: '../sw.js',
     precacheManifestFilename: 'js/precache-manifest.[manifestHash].js',
-    importScripts: [
-      '/dist/workbox-catch-handler.js'
-    ],
-    exclude: [
-      /\.(png|jpe?g|gif|svg|webp)$/i,
-      /\.map$/,
-      /^manifest.*\\.js(?:on)?$/
-    ],
+    importScripts: ['/dist/workbox-catch-handler.js'],
+    exclude: [/\.(png|jpe?g|gif|svg|webp)$/i, /\.map$/, /^manifest.*\\.js(?:on)?$/],
     globDirectory: './web/',
-    globPatterns: [
-      'offline.html',
-      'offline.svg'
-    ],
+    globPatterns: ['offline.html', 'offline.svg'],
     offlineGoogleAnalytics: true,
     runtimeCashing: [
       {
@@ -107,4 +97,4 @@ export default {
       }
     ]
   }
-}
+};
